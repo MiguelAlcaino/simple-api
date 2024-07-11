@@ -15,6 +15,17 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class TweetController extends AbstractController
 {
+    #[Route('/tweets', name: 'tweet_options', methods: ['OPTIONS'])]
+    public function options(): JsonResponse
+    {
+        $jsonResponse = new JsonResponse();
+        $jsonResponse->headers->set('Access-Control-Allow-Origin', '*');
+        $jsonResponse->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+        $jsonResponse->headers->set('Access-Control-Allow-Headers', 'Content-Type');
+
+        return $jsonResponse;
+    }
+
     #[Route('/tweets', name: 'tweet_list', methods: ['GET'])]
     public function allTweets(TweetRepository $tweetRepository): JsonResponse
     {
