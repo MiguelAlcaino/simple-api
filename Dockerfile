@@ -1,5 +1,8 @@
 FROM php:8.3-alpine
 
+ARG DATABASE_URL
+ARG APP_ENV
+
 RUN set -ex \
   && apk --no-cache add \
     postgresql-dev
@@ -14,8 +17,7 @@ COPY . /app
 
 WORKDIR /app
 ENV COMPOSER_ALLOW_SUPERUSER 1
-ENV APP_ENV=prod
 RUN composer install --no-interaction --no-progress --no-suggest
-RUN bin/console doctrine:schema:update --force
+RUN APP_ENV=$APP_ENV DATABASE_URL=$DATABASE_URL bin/console doctrine:schema:update --force
 
 CMD ["php", "bin/react-php-server"]
