@@ -1,0 +1,46 @@
+#!/usr/bin/env php
+<?php
+
+use App\Kernel;
+use Psr\Http\Message\ServerRequestInterface;
+use React\Http\HttpServer;
+use React\Http\Message\Response;
+use React\Socket\SocketServer;
+use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+
+require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+
+return function (array $context) {
+    $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+
+    $httpFoundationFactory = new HttpFoundationFactory();
+    $psr7Factory = new PsrHttpFactory();
+
+    $callback = function (ServerRequestInterface $request) use ($kernel, $httpFoundationFactory, $psr7Factory)  {
+        try {
+            $sfRequest = $httpFoundationFactory->createRequest($request);
+            $sfResponse = $kernel->handle($sfRequest);
+            $kernel->terminate($sfRequest, $sfResponse);
+
+            return $psr7Factory->createResponse($sfResponse);
+        } catch (Throwable $exception) {
+            $response = Response::plaintext($exception->getMessage());
+            $response->withStatus(Response::STATUS_INTERNAL_SERVER_ERROR);
+            return $response;
+        }
+    };
+
+    $httpServer = new HttpServer($callback);
+
+    $httpServer->on('error', function(\Exception $exception) {
+        echo $exception->getMessage() . PHP_EOL;
+        echo $exception->getFile() . ':' . $exception->getLine() . PHP_EOL;
+        echo $exception->getTraceAsString() . PHP_EOL;
+    });
+
+    $socket = new SocketServer("0.0.0.0:8001");
+    $httpServer->listen($socket);
+
+    echo "Server running at http://127.0.0.1:8001" . PHP_EOL;
+};
