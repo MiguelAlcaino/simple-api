@@ -26,6 +26,17 @@ class TweetController extends AbstractController
         return $jsonResponse;
     }
 
+    #[Route('/tweets/{id}', name: 'tweet_options_with_id', methods: ['OPTIONS'])]
+    public function optionsWithId(): JsonResponse
+    {
+        $jsonResponse = new JsonResponse();
+        $jsonResponse->headers->set('Access-Control-Allow-Origin', '*');
+        $jsonResponse->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+        $jsonResponse->headers->set('Access-Control-Allow-Headers', 'Content-Type');
+
+        return $jsonResponse;
+    }
+
     #[Route('/tweets', name: 'tweet_list', methods: ['GET'])]
     public function allTweets(TweetRepository $tweetRepository): JsonResponse
     {
