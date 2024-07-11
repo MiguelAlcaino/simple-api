@@ -21,7 +21,10 @@ class TweetController extends AbstractController
         $tweets      = $tweetRepository->findAllFromNewest();
         $tweetsArray = array_map(fn($tweet) => $this->transformTweetToArray($tweet), $tweets);
 
-        return new JsonResponse($tweetsArray);
+        $jsonResponse = new JsonResponse($tweetsArray);
+        $jsonResponse->headers->set('Access-Control-Allow-Origin', '*');
+
+        return $jsonResponse;
     }
 
     private function transformTweetToArray(Tweet $tweet): array
@@ -44,7 +47,10 @@ class TweetController extends AbstractController
         $em->persist($tweet);
         $em->flush();
 
-        return new JsonResponse($this->transformTweetToArray($tweet));
+        $jsonResponse = new JsonResponse($this->transformTweetToArray($tweet));
+        $jsonResponse->headers->set('Access-Control-Allow-Origin', '*');
+
+        return $jsonResponse;
     }
 
     #[Route('/tweets/{id}', name: 'tweet_update', methods: ['POST'])]
@@ -58,7 +64,10 @@ class TweetController extends AbstractController
         $tweet->setTweetBody($data['tweetBody'])->setUsername($data['username']);
         $em->flush();
 
-        return new JsonResponse($this->transformTweetToArray($tweet));
+        $jsonResponse = new JsonResponse($this->transformTweetToArray($tweet));
+        $jsonResponse->headers->set('Access-Control-Allow-Origin', '*');
+
+        return $jsonResponse;
     }
 
     #[Route('/tweets/{id}', name: 'tweet_delete', methods: ['DELETE'])]
@@ -71,6 +80,9 @@ class TweetController extends AbstractController
         $em->remove($tweet);
         $em->flush();
 
-        return new JsonResponse(['status' => 'Tweet deleted']);
+        $jsonResponse = new JsonResponse(['status' => 'Tweet deleted']);
+        $jsonResponse->headers->set('Access-Control-Allow-Origin', '*');
+
+        return $jsonResponse;
     }
 }
