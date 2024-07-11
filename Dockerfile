@@ -15,5 +15,6 @@ COPY . /app
 WORKDIR /app
 ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN composer install --no-interaction --no-progress --no-suggest
+RUN bin/console doctrine:schema:update --force
 
 CMD ["php", "bin/react-php-server"]
