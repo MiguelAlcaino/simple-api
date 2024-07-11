@@ -14,6 +14,7 @@ COPY . /app
 
 WORKDIR /app
 ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV APP_ENV=prod
 RUN composer install --no-interaction --no-progress --no-suggest
 RUN bin/console doctrine:schema:update --force
 
