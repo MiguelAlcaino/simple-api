@@ -2,6 +2,7 @@ FROM php:8.3-alpine
 
 ARG DATABASE_URL
 ARG APP_ENV
+ARG SKIP_DB_UPDATE=1
 
 RUN set -ex \
   && apk --no-cache add \
@@ -18,6 +19,9 @@ COPY . /app
 WORKDIR /app
 ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN composer install --no-interaction --no-progress --no-suggest
-RUN APP_ENV=$APP_ENV DATABASE_URL=$DATABASE_URL bin/console doctrine:schema:update --force
+
+RUN if [ "$SKIP_DB_UPDATE" = "0" ]; then \
+    APP_ENV=$APP_ENV DATABASE_URL=$DATABASE_URL bin/console doctrine:schema:update --force; \
+    fi
 
 CMD ["php", "bin/react-php-server"]
