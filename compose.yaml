@@ -1,8 +1,24 @@
 services:
 ###> doctrine/doctrine-bundle ###
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_ENV: ${APP_ENV:-dev}
+        DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "8001:8001"
+    depends_on:
+      - database
+    networks:
+      - app
   database:
+    networks:
+      - app
     image: postgres:${POSTGRES_VERSION:-16}-alpine
     environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_DB: ${POSTGRES_DB:-app}
       # You should definitely change the password in production
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
@@ -17,6 +33,9 @@ services:
       # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
       # - ./docker/db/data:/var/lib/postgresql/data:rw
 ###< doctrine/doctrine-bundle ###
+
+networks:
+  app:
 
 volumes:
 ###> doctrine/doctrine-bundle ###
